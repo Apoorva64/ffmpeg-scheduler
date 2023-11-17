@@ -3,6 +3,6 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - helm-repository.yaml
-#  - postgres
-#  - rabbitmq
+  - postgres
+  - rabbitmq
   - celery-worker
