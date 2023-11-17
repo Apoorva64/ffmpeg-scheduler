@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: celery
-          image: git.ozeliurs.com/youtube-analyser/backend:v1.0.1
+          image: ghcr.io/apoorva64/ffmpeg-scheduler:latest
           command: [ "deployment/entry_point.sh" ]
           env:
             - name: POSTGRES_HOST
