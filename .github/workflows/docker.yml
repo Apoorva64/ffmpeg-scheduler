@@ -28,6 +28,6 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: apoorva64/ffmpeg-scheduler:latest
+          tags: ghcr.io/apoorva64/ffmpeg-scheduler:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
