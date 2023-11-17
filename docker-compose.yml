@@ -27,3 +27,5 @@ services:
       - .env
     command: "./deployment/entry_point_celery_beat.sh"
 
+  postgres:
+    image: postgres:latest
