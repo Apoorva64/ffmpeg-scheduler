@@ -1,0 +1,16 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: rabbitmq
+  namespace: ffmpeg-scheduler
+spec:
+  interval: 60m
+  chart:
+    spec:
+      chart: rabbitmq
+      version: "*"
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: youtube-analyser
+      interval: 24h

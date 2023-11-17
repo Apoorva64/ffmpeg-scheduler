@@ -6,4 +6,9 @@ djangorestframework
 grpcio
 grpcio-tools
 minio~=7.2.0
-python-ffmpeg
+python-ffmpeg==2.0.4
+whitenoise
+gunicorn
+django_celery_results
+django_celery_beat
+celery_progress

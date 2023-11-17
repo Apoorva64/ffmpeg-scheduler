@@ -24,7 +24,27 @@ SECRET_KEY = 'django-insecure-7ao09y)%f@feksbcwn5f24@$9@lhog#i^nh0@q*jkbb!-#!mf*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+import environ
+
+env = environ.Env(
+    # set casting, default value
+    DJANGO_ADMIN_USERNAME=(str, 'admin'),
+    DJANGO_ADMIN_PASSWORD=(str, 'admin'),
+    POSTGRES_HOST=(str, 'localhost'),
+    POSTGRES_USER=(str, 'postgres'),
+    POSTGRES_PASSWORD=(str, 'postgres'),
+    POSTGRES_DB=(str, 'youtube_sentiment_analyzer'),
+    RABBITMQ_HOST=(str, 'localhost'),
+    RABBITMQ_USER=(str, 'guest'),
+    RABBITMQ_PORT=(int, 5672),
+    RABBITMQ_PASSWORD=(str, 'guest'),
+    RABBITMQ_VHOST=(str, '/'),
+    RAY_ADDRESS=(str, 'ray://localhost:10001'),
+    RAY_SERVE_ADDRESS=(str, 'https://ray-serve.ray.apoorva64.com'),
+)
+
+ALLOWED_HOSTS = ["*"]
+
 
 # Application definition
 
@@ -115,6 +135,15 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATIC_ROOT = BASE_DIR / 'staticfiles/'
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+)
+# whitenoise
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -128,3 +157,8 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_BROKER_URL = f'amqp://guest:guest@localhost:5672//'
+
+# ADMIN
+# get email and password from environment variables
+DJANGO_ADMIN_USERNAME = env('DJANGO_ADMIN_USERNAME')
+DJANGO_ADMIN_PASSWORD = env('DJANGO_ADMIN_PASSWORD')
