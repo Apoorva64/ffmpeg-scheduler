@@ -13,17 +13,17 @@ services:
       - .env
     ports:
       - "8000:8000"
-    command: "entry_point.sh"
+    command: "deployment/entry_point.sh"
 
   worker:
     build: .
     env_file:
       - .env
-    command: "entry_point_celery.sh"
+    command: "deployment/entry_point_celery.sh"
 
   bite:
     build: .
     env_file:
       - .env
-    command: "entry_point_celery_beat.sh"
+    command: "deployment/entry_point_celery_beat.sh"
 
