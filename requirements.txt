@@ -13,3 +13,5 @@ django_celery_results
 django_celery_beat
 celery_progress
 django-environ
+psycopg2-binary; sys_platform != 'win32'
+psycopg2; sys_platform == 'win32'
