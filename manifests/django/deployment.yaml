@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: celery
+  name: django
   namespace: ffmpeg-scheduler
 spec:
   selector:
     matchLabels:
-      app: celery
+      app: django
   replicas: 1
   template:
     metadata:
       labels:
-        app: celery
+        app: django
     spec:
       containers:
       - name: celery
         image: git.ozeliurs.com/youtube-analyser/backend:v1.0.1
-        command: ["deployment/entry_point_celery.sh"]
+        command: ["deployment/entry_point.sh"]
         env:
           - name: POSTGRES_HOST
             value: "postgresql"
