@@ -28,7 +28,7 @@ spec:
                   name: postgresql
                   key: postgres-password
             - name: POSTGRES_DB
-              value: "youtube-analyser"
+              value: "postgres"
             - name: RABBITMQ_HOST
               value: "rabbitmq"
             - name: RABBITMQ_USER
