@@ -8,11 +8,13 @@ from ffmpeg import FFmpeg, Progress, FFmpegError
 from minio import Minio
 from minio.error import S3Error
 from minio.commonconfig import Tags
+from django.conf import settings
 
 client = Minio(
-    "api.minio.storage.apoorva64.com",
-    access_key="V9FPjgmzlm04krjN8OVy",
-    secret_key="emPwYL6GqaGt4CttBGV7OVjypjyFcHXdnHzw0MhE"
+    endpoint=settings.MINIO_ENDPOINT,
+    access_key=settings.MINIO_ACCESS_KEY,
+    secret_key=settings.MINIO_SECRET_KEY,
+    secure=settings.MINIO_SECURE,
 )
 
 BUCKET_NAME = "h264-transcoding"

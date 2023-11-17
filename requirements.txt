@@ -12,3 +12,4 @@ gunicorn
 django_celery_results
 django_celery_beat
 celery_progress
+django-environ

@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+import environ
 
 from pathlib import Path
 
@@ -24,7 +25,6 @@ SECRET_KEY = 'django-insecure-7ao09y)%f@feksbcwn5f24@$9@lhog#i^nh0@q*jkbb!-#!mf*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-import environ
 
 env = environ.Env(
     # set casting, default value
@@ -41,6 +41,10 @@ env = environ.Env(
     RABBITMQ_VHOST=(str, '/'),
     RAY_ADDRESS=(str, 'ray://localhost:10001'),
     RAY_SERVE_ADDRESS=(str, 'https://ray-serve.ray.apoorva64.com'),
+    MINIO_ENDPOINT=(str, 'api.minio.storage.apoorva64.com'),
+    MINIO_ACCESS_KEY=(str, ''),
+    MINIO_SECRET_KEY=(str, ''),
+    MINIO_SECURE=(bool, False),
 )
 
 ALLOWED_HOSTS = ["*"]
@@ -96,8 +100,12 @@ WSGI_APPLICATION = 'ffmpeg_scheduler.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env("POSTGRES_DB"),
+        'USER': env("POSTGRES_USER"),
+        'PASSWORD': env("POSTGRES_PASSWORD"),
+        'HOST': env('POSTGRES_HOST'),
+        'PORT': '5432',
     }
 }
 
@@ -162,3 +170,9 @@ CELERY_BROKER_URL = f'amqp://guest:guest@localhost:5672//'
 # get email and password from environment variables
 DJANGO_ADMIN_USERNAME = env('DJANGO_ADMIN_USERNAME')
 DJANGO_ADMIN_PASSWORD = env('DJANGO_ADMIN_PASSWORD')
+
+# Minio
+MINIO_ENDPOINT = env('MINIO_ENDPOINT')
+MINIO_ACCESS_KEY = env('MINIO_ACCESS_KEY')
+MINIO_SECRET_KEY = env('MINIO_SECRET_KEY')
+MINIO_SECURE = env('MINIO_SECURE')

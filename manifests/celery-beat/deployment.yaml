@@ -14,32 +14,53 @@ spec:
         app: celery-beat
     spec:
       containers:
-      - name: celery
-        image: git.ozeliurs.com/youtube-analyser/backend:v1.0.1
-        command: ["deployment/entry_point_celery.sh"]
-        env:
-          - name: POSTGRES_HOST
-            value: "postgresql"
-          - name: POSTGRES_USER
-            value: "postgres"
-          - name: POSTGRES_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: postgresql
-                key: postgres-password
-          - name: POSTGRES_DB
-            value: "youtube-analyser"
-          - name: RABBITMQ_HOST
-            value: "rabbitmq"
-          - name: RABBITMQ_USER
-            value: "youtube-analyser"
-          - name: RABBITMQ_PORT
-            value: "5672"
-          - name: RABBITMQ_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: rabbitmq
-                key: rabbitmq-password
-          - name: RABBITMQ_VHOST
-            value: "/"
+        - name: celery
+          image: git.ozeliurs.com/youtube-analyser/backend:v1.0.1
+          command: [ "deployment/entry_point_celery_beat.sh" ]
+          env:
+            - name: POSTGRES_HOST
+              value: "postgresql"
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql
+                  key: postgres-password
+            - name: POSTGRES_DB
+              value: "youtube-analyser"
+            - name: RABBITMQ_HOST
+              value: "rabbitmq"
+            - name: RABBITMQ_USER
+              value: "youtube-analyser"
+            - name: RABBITMQ_PORT
+              value: "5672"
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq
+                  key: rabbitmq-password
+            - name: RABBITMQ_VHOST
+              value: "/"
 
+            - name: MINIO_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: minio-auth
+                  key: MINIO_ENDPOINT
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-auth
+                  key: MINIO_ACCESS_KEY
+
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-auth
+                  key: MINIO_SECRET_KEY
+            - name: MINIO_SECURE
+              valueFrom:
+                secretKeyRef:
+                  name: minio-auth
+                  key: MINIO_SECURE
