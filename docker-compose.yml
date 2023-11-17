@@ -4,5 +4,19 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     ports:
-      - 15672:15672
-      - 5672:5672
+      - "15672:15672"
+      - "5672:5672"
+
+  server:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    command: "entry_point.sh"
+
+  worker:
+    build: .
+    env_file:
+      - .env
+    command: "entry_point_celery.sh"

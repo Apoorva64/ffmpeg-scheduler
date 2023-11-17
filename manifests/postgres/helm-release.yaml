@@ -2,7 +2,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: postgresql
-  namespace:  youtube-analyser
+  namespace: ffmpeg-scheduler
 spec:
   interval: 60m
   chart:
@@ -14,3 +14,5 @@ spec:
         name: bitnami
         namespace: youtube-analyser
       interval: 24h
+  values:
+    storageClass: longhorn-single-replica

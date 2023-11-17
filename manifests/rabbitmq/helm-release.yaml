@@ -14,3 +14,6 @@ spec:
         name: bitnami
         namespace: youtube-analyser
       interval: 24h
+  values:
+    persistence:
+      storageClass: longhorn-single-replica
