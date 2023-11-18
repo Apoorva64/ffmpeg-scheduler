@@ -1,4 +1,4 @@
-FROM python:3.8-bookworm
+FROM python:3.11-bookworm
 ENV TZ=Europe/Paris
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
