@@ -32,7 +32,7 @@ spec:
             - name: RABBITMQ_HOST
               value: "rabbitmq"
             - name: RABBITMQ_USER
-              value: "youtube-analyser"
+              value: "user"
             - name: RABBITMQ_PORT
               value: "5672"
             - name: RABBITMQ_PASSWORD

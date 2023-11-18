@@ -165,7 +165,7 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
-CELERY_BROKER_URL = f'amqp://guest:guest@localhost:5672//'
+CELERY_BROKER_URL = f'amqp://{env("RABBITMQ_USER")}:{env("RABBITMQ_PASSWORD")}@{env("RABBITMQ_HOST")}:{env("RABBITMQ_PORT")}/{env("RABBITMQ_VHOST")}'
 
 # ADMIN
 # get email and password from environment variables
