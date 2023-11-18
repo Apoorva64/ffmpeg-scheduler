@@ -89,7 +89,7 @@ def transcode_job(self, input_folder_id, output_folder_id, r_filename: str):
             {
                 'c:v': 'libx264',
                 'c:a': 'aac',
-                'c:s': 'srt',
+                'c:s': 'copy',
                 'ac': '2',
                 'pix_fmt': 'yuv420p',
                 'map': '0'
