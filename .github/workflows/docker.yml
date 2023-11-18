@@ -28,4 +28,4 @@ jobs:
         with:
           platforms: linux/arm64
           push: true
-          tags: ghcr.io/apoorva64/ffmpeg-scheduler/main:1.0.1
+          tags: ghcr.io/apoorva64/ffmpeg-scheduler/main:1.0.2
