@@ -33,14 +33,12 @@ env = environ.Env(
     POSTGRES_HOST=(str, 'localhost'),
     POSTGRES_USER=(str, 'postgres'),
     POSTGRES_PASSWORD=(str, 'postgres'),
-    POSTGRES_DB=(str, 'youtube_sentiment_analyzer'),
+    POSTGRES_DB=(str, 'postgres'),
     RABBITMQ_HOST=(str, 'localhost'),
     RABBITMQ_USER=(str, 'guest'),
     RABBITMQ_PORT=(int, 5672),
     RABBITMQ_PASSWORD=(str, 'guest'),
     RABBITMQ_VHOST=(str, '/'),
-    RAY_ADDRESS=(str, 'ray://localhost:10001'),
-    RAY_SERVE_ADDRESS=(str, 'https://ray-serve.ray.apoorva64.com'),
     MINIO_ENDPOINT=(str, 'api.minio.storage.apoorva64.com'),
     MINIO_ACCESS_KEY=(str, ''),
     MINIO_SECRET_KEY=(str, ''),
@@ -61,7 +59,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_celery_results',
     'django_celery_beat',
-    'ffmpeg_rest_api',
+    'ffmpeg_transcoder',
 ]
 
 MIDDLEWARE = [
