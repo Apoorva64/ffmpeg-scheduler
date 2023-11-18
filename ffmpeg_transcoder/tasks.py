@@ -127,7 +127,7 @@ def transcode_job(self, input_folder_id, output_folder_id, r_filename: str):
     # Upload file
     output_folder_client.fput_object(
         output_folder.bucket.name,
-        output_folder.prefix + "/" + r_filename,
+        str(Path(output_folder.prefix + "/" + r_filename).with_suffix(".mp4")),
         object_upload_path
     )
     progress_recorder.set_progress(100, 100, description="Upload completed")
