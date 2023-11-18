@@ -27,18 +27,16 @@ def update_task(input_folder_id, output_folder_id):
     # list files in bucket in path /video_to_transcode
     for obj in input_folder_client.list_objects(input_folder.bucket.name, prefix=input_folder.prefix, recursive=True):
         tags = input_folder_client.get_object_tags(input_folder.bucket.name, obj.object_name)
-        if tags is None or tags.get("scheduled") is None:
+        if tags is None or tags.get("scheduled") is None or tags.get("scheduled") == "false":
             transcode_job.delay(input_folder_id, output_folder_id,
                                 obj.object_name.removeprefix(input_folder.prefix + "/"))
             # Set scheduled tag
+            tags = Tags()
+            tags["scheduled"] = "true"
             input_folder_client.set_object_tags(
                 input_folder.bucket.name,
                 obj.object_name,
-                Tags(
-                    {
-                        "scheduled": "true"
-                    }
-                ),
+                tags,
             )
 
 
@@ -116,10 +114,15 @@ def transcode_job(self, input_folder_id, output_folder_id, r_filename: str):
     except FFmpegError as e:
         if object_upload_path.is_file():
             object_upload_path.unlink()
-        return {
-            "error": e,
-            "filename": r_filename
-        }
+        # Set scheduled tag
+        tags = Tags()
+        tags["scheduled"] = "false"
+        input_folder_client.set_object_tags(
+            input_folder.bucket.name,
+            input_folder.prefix + "/" + r_filename,
+            tags,
+        )
+        raise e
     print("Transcoding completed")
     progress_recorder.set_progress(total_frames, total_frames, description="Transcoding completed")
     progress_recorder.set_progress(0, 100, description="Uploading transcoded file")
