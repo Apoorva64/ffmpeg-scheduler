@@ -8,3 +8,8 @@ resources:
   - celery-worker
   - django
   - celery-beat
+
+images:
+  - name: ghcr.io/apoorva64/ffmpeg-scheduler/main
+    newName: ghcr.io/apoorva64/ffmpeg-scheduler/main
+    newTag: v1.0.0
