@@ -25,7 +25,6 @@ SECRET_KEY = 'django-insecure-7ao09y)%f@feksbcwn5f24@$9@lhog#i^nh0@q*jkbb!-#!mf*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-
 env = environ.Env(
     # set casting, default value
     DJANGO_ADMIN_USERNAME=(str, 'admin'),
@@ -46,7 +45,6 @@ env = environ.Env(
 )
 
 ALLOWED_HOSTS = ["*"]
-
 
 # Application definition
 
@@ -164,6 +162,7 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_BROKER_URL = f'amqp://{env("RABBITMQ_USER")}:{env("RABBITMQ_PASSWORD")}@{env("RABBITMQ_HOST")}:{env("RABBITMQ_PORT")}/{env("RABBITMQ_VHOST")}'
+CELERY_RESULT_EXTENDED = True
 
 # ADMIN
 # get email and password from environment variables
