@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: celery
-          image: ghcr.io/apoorva64/ffmpeg-scheduler:latest
+          image: ghcr.io/apoorva64/ffmpeg-scheduler/main:latest
           command: [ "deployment/entry_point_celery_beat.sh" ]
           env:
             - name: POSTGRES_HOST
