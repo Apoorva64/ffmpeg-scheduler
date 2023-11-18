@@ -66,7 +66,7 @@ def transcode_job(self, input_folder_id, output_folder_id, r_filename: str):
     object_download_path = Path(DOWNLOAD_FOLDER) / hashed_filename
     object_download_path.parent.mkdir(parents=True, exist_ok=True)
 
-    object_upload_path = Path(UPLOAD_FOLDER) / hashed_filename
+    object_upload_path = (Path(UPLOAD_FOLDER) / hashed_filename).with_suffix(".mp4")
     object_upload_path.parent.mkdir(parents=True, exist_ok=True)
 
     progress_recorder.set_progress(0, 100, description="Downloading file: " + r_filename)
