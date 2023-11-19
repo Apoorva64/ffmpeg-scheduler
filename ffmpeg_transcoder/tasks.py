@@ -11,7 +11,7 @@ from minio.commonconfig import Tags
 from ffmpeg_scheduler.celery import app
 from ffmpeg_transcoder.models import Folder
 import hashlib
-
+from split_video import split_video
 TEMP_FOLDER = Path("temp")
 TEMP_FOLDER.mkdir(parents=True, exist_ok=True)
 DOWNLOAD_FOLDER = TEMP_FOLDER / "download"
