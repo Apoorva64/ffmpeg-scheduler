@@ -12,4 +12,4 @@ resources:
 images:
   - name: ghcr.io/apoorva64/ffmpeg-scheduler/main
     newName: ghcr.io/apoorva64/ffmpeg-scheduler/main
-    newTag: 1.0.10
+    newTag: 1.0.11
