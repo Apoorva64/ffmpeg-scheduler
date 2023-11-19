@@ -28,7 +28,7 @@ jobs:
         with:
           platforms: linux/arm64,linux/amd64
           push: true
-          tags: ghcr.io/apoorva64/ffmpeg-scheduler/main:1.0.12
+          tags: ghcr.io/apoorva64/ffmpeg-scheduler/main:1.0.13
           # github cache
           cache-from: type=gha,scope=global
           cache-to: type=gha,mode=max
