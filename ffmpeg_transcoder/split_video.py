@@ -6,9 +6,8 @@ from celery_progress.backend import ProgressRecorder
 from minio.commonconfig import Tags
 
 from ffmpeg_transcoder.models import Folder
-from ffmpeg_transcoder.tasks import DOWNLOAD_FOLDER
 from ffmpeg import FFmpeg, Progress, FFmpegError
-
+from django.conf import settings
 
 @shared_task(bind=True)
 def split_video(self, input_folder_id, output_folder_id, r_filename: str):
@@ -21,11 +20,11 @@ def split_video(self, input_folder_id, output_folder_id, r_filename: str):
     # Download file
     hashed_filename = hashlib.md5((r_filename + str(input_folder.id) + "splitVideo").encode()).hexdigest() + Path(
         r_filename).suffix
-    object_download_path = DOWNLOAD_FOLDER / hashed_filename
+    object_download_path = settings.DOWNLOAD_FOLDER / hashed_filename
     input_folder_client.fget_object(input_folder.bucket.name, r_filename, object_download_path)
 
     # Create output folder
-    output_folder_path = Path(DOWNLOAD_FOLDER) / hashed_filename
+    output_folder_path = Path(settings.UPLOAD_FOLDER) / hashed_filename
     output_folder_path.parent.mkdir(parents=True, exist_ok=True)
 
     template = str((output_folder_path / "%03d").with_suffix(Path(r_filename).suffix))

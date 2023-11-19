@@ -7,17 +7,13 @@ from celery import shared_task
 from celery_progress.backend import ProgressRecorder
 from ffmpeg import FFmpeg, Progress, FFmpegError
 from minio.commonconfig import Tags
+from django.conf import settings
 
 from ffmpeg_scheduler.celery import app
 from ffmpeg_transcoder.models import Folder
 import hashlib
 from ffmpeg_transcoder.split_video import split_video
-TEMP_FOLDER = Path("temp")
-TEMP_FOLDER.mkdir(parents=True, exist_ok=True)
-DOWNLOAD_FOLDER = TEMP_FOLDER / "download"
-DOWNLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
-UPLOAD_FOLDER = TEMP_FOLDER / "upload"
-UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
+
 
 
 @shared_task()
@@ -61,10 +57,10 @@ def transcode_job(self, input_folder_id, output_folder_id, r_filename: str):
 
     hashed_filename = hashlib.md5((r_filename + str(input_folder.id)).encode()).hexdigest() + Path(r_filename).suffix
 
-    object_download_path = Path(DOWNLOAD_FOLDER) / hashed_filename
+    object_download_path = Path(settings.DOWNLOAD_FOLDER) / hashed_filename
     object_download_path.parent.mkdir(parents=True, exist_ok=True)
 
-    object_upload_path = (Path(UPLOAD_FOLDER) / hashed_filename).with_suffix(".mkv")
+    object_upload_path = (Path(settings.UPLOAD_FOLDER) / hashed_filename).with_suffix(".mkv")
     object_upload_path.parent.mkdir(parents=True, exist_ok=True)
 
     progress_recorder.set_progress(0, 100, description="Downloading file: " + r_filename)

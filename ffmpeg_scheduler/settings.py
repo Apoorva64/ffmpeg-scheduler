@@ -174,3 +174,11 @@ MINIO_ENDPOINT = env('MINIO_ENDPOINT')
 MINIO_ACCESS_KEY = env('MINIO_ACCESS_KEY')
 MINIO_SECRET_KEY = env('MINIO_SECRET_KEY')
 MINIO_SECURE = env('MINIO_SECURE')
+
+
+TEMP_FOLDER = Path("temp")
+TEMP_FOLDER.mkdir(parents=True, exist_ok=True)
+DOWNLOAD_FOLDER = TEMP_FOLDER / "download"
+DOWNLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
+UPLOAD_FOLDER = TEMP_FOLDER / "upload"
+UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
