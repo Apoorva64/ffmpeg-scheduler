@@ -1,3 +1,4 @@
+import base64
 import hashlib
 from pathlib import Path
 
@@ -12,6 +13,7 @@ from django.conf import settings
 
 @shared_task(bind=True)
 def split_video(self, input_folder_id, output_folder_id, r_filename: str):
+    print("Splitting video")
     input_folder = Folder.objects.get(pk=input_folder_id)
     output_folder = Folder.objects.get(pk=output_folder_id)
     input_folder_client = input_folder.bucket.connection.get_client()
@@ -22,14 +24,18 @@ def split_video(self, input_folder_id, output_folder_id, r_filename: str):
     hashed_filename = hashlib.md5((r_filename + str(input_folder.id) + "splitVideo").encode()).hexdigest() + Path(
         r_filename).suffix
     object_download_path = settings.DOWNLOAD_FOLDER / hashed_filename
-    input_folder_client.fget_object(input_folder.bucket.name,
-                                    input_folder.prefix + "/" + r_filename, object_download_path)
+    print("Downloading file", r_filename + " to ", object_download_path)
+    if not object_download_path.exists():
+        input_folder_client.fget_object(input_folder.bucket.name,
+                                        input_folder.prefix + "/" + r_filename, object_download_path)
 
     # Create output folder
-    output_folder_path = Path(settings.UPLOAD_FOLDER) / hashed_filename
-    output_folder_path.parent.mkdir(parents=True, exist_ok=True)
+    output_folder_path = Path(settings.UPLOAD_FOLDER) / hashed_filename.removesuffix(Path(
+        r_filename).suffix)
+    output_folder_path.mkdir(parents=True, exist_ok=True)
 
-    template = str((output_folder_path / "%03d").with_suffix(Path(r_filename).suffix))
+    template = str((output_folder_path / "%04d").with_suffix(Path(r_filename).suffix))
+
     # Split video
     ffmpeg = (
         FFmpeg()
@@ -40,7 +46,7 @@ def split_video(self, input_folder_id, output_folder_id, r_filename: str):
             'map': '0',
             'segment_time': '00:10:00',
             'f': 'segment',
-            'reset_timestamps': '1'
+            'reset_timestamps': '1',
         })
     )
 
@@ -73,18 +79,21 @@ def split_video(self, input_folder_id, output_folder_id, r_filename: str):
 
     # Upload folder
     for file in output_folder_path.glob("*"):
-        output_folder_client.fput_object(output_folder.bucket.name, output_folder.prefix + "/" + file.name, file)
+        print("Uploading file", file.name)
+        output_folder_client.fput_object(output_folder.bucket.name, output_folder.prefix + "/" + r_filename + "/" + file.name, file)
+
         # tag file
         tags = Tags()
         tags["scheduled"] = "false"
-        tags["parent"] = r_filename
+        tags["parent"] = base64.b64encode(str(r_filename).encode()).decode()
         tags["type"] = "split"
         output_folder_client.set_object_tags(
             output_folder.bucket.name,
-            output_folder.prefix + "/" + file.name,
+            output_folder.prefix + "/" + r_filename + "/" + file.name,
             tags,
         )
         file.unlink()
+        print("Uploaded file", file.name)
 
     output_folder_path.rmdir()
     # delete file
@@ -99,6 +108,12 @@ def split_video(self, input_folder_id, output_folder_id, r_filename: str):
         tags,
     )
     print("Splitting completed")
+    print("Deleting input file")
+    # Delete input file
+    input_folder_client.remove_object(
+        input_folder.bucket.name,
+        input_folder.prefix + "/" + r_filename
+    )
     progress_recorder.set_progress(100, 100, description="Splitting completed")
 
     return f"Splitting completed for file: {r_filename} 🎉"

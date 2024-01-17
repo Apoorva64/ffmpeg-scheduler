@@ -15,17 +15,23 @@ import hashlib
 from ffmpeg_transcoder.split_video import split_video
 
 
-
 @shared_task()
 def update_task(input_folder_id, output_folder_id):
     input_folder = Folder.objects.get(pk=input_folder_id)
     input_folder_client = input_folder.bucket.connection.get_client()
+    output_folder = Folder.objects.get(pk=output_folder_id)
+    split_folder = Folder.objects.get_or_create(prefix=output_folder.prefix + "/split", bucket=output_folder.bucket)[0]
+    transcoded_parts_folder = Folder.objects.get_or_create(prefix=output_folder.prefix + "/transcode-parts",
+                                                           bucket=output_folder.bucket)[0]
     # list files in bucket in path /video_to_transcode
     for obj in input_folder_client.list_objects(input_folder.bucket.name, prefix=input_folder.prefix, recursive=True):
         tags = input_folder_client.get_object_tags(input_folder.bucket.name, obj.object_name)
         if tags is None or tags.get("scheduled") is None or tags.get("scheduled") == "false":
-            transcode_job.delay(input_folder_id, output_folder_id,
-                                obj.object_name.removeprefix(input_folder.prefix + "/"))
+            print("Scheduling file: ", obj.object_name)
+            # Create Folder to contain split files
+
+            split_video.delay(input_folder_id, split_folder.id,
+                              obj.object_name.removeprefix(input_folder.prefix + "/"))
             # Set scheduled tag
             tags = Tags()
             tags["scheduled"] = "true"
@@ -34,6 +40,28 @@ def update_task(input_folder_id, output_folder_id):
                 obj.object_name,
                 tags,
             )
+    for obj in split_folder.bucket.connection.get_client().list_objects(split_folder.bucket.name,
+                                                                        prefix=split_folder.prefix,
+                                                                        recursive=True):
+        tags = split_folder.bucket.connection.get_client().get_object_tags(split_folder.bucket.name, obj.object_name)
+        if tags is not None and (tags.get("scheduled") is None or tags.get("scheduled") == "false"):
+            path = Path(obj.object_name)
+            from_folder = Folder.objects.get_or_create(prefix=path.parent.as_posix(),
+                                                       bucket=split_folder.bucket)[0]
+            processed_folder = Folder.objects.get_or_create(prefix=transcoded_parts_folder.prefix + "/" + path.parent.name,
+                                                            bucket=output_folder.bucket)[0]
+            # Create Folder to contain split files
+            transcode_job.delay(from_folder.id, processed_folder.id, path.name)
+            # Set scheduled tag
+            tags = split_folder.bucket.connection.get_client().get_object_tags(split_folder.bucket.name,
+                                                                               obj.object_name)
+            tags["scheduled"] = "true"
+            split_folder.bucket.connection.get_client().set_object_tags(
+                split_folder.bucket.name,
+                obj.object_name,
+                tags,
+            )
+
 
 
 def get_frame_count(file_path):
@@ -54,7 +82,10 @@ def transcode_job(self, input_folder_id, output_folder_id, r_filename: str):
     output_folder_client = output_folder.bucket.connection.get_client()
     progress_recorder = ProgressRecorder(self)
     progress_recorder.set_progress(0, 100, description="Transcoding job started for file: " + r_filename)
-
+    print("Transcoding job started for file: ", r_filename, " from folder: ", input_folder.prefix, " to folder: ",
+          output_folder.prefix, " with input bucket: ", input_folder.bucket.name, " and output bucket: ",
+          output_folder.bucket.name)
+    # Download file
     hashed_filename = hashlib.md5((r_filename + str(input_folder.id)).encode()).hexdigest() + Path(r_filename).suffix
 
     object_download_path = Path(settings.DOWNLOAD_FOLDER) / hashed_filename
@@ -126,9 +157,21 @@ def transcode_job(self, input_folder_id, output_folder_id, r_filename: str):
     # Upload file
     output_folder_client.fput_object(
         output_folder.bucket.name,
-        str(Path(output_folder.prefix + "/" + r_filename).with_suffix(".mkv")),
+        Path(output_folder.prefix + "/" + r_filename).with_suffix(".mkv").as_posix(),
         object_upload_path
     )
+    # copy tags
+    tags = input_folder_client.get_object_tags(input_folder.bucket.name, input_folder.prefix + "/" + r_filename)
+    tags["scheduled"] = "false"
+    tags["finished"] = "true"
+    output_folder_client.set_object_tags(
+        output_folder.bucket.name,
+        Path(output_folder.prefix + "/" + r_filename).with_suffix(".mkv").as_posix(),
+        tags,
+    )
+
+
+
     progress_recorder.set_progress(100, 100, description="Upload completed")
     progress_recorder.set_progress(0, 100, description="Deleting input file")
     print("Deleting input file")
